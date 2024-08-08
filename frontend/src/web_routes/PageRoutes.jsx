@@ -8,7 +8,11 @@ import Error404 from '../components/Error404';
 import Events from '../pages/Events';
 import ProfilePage from '../pages/ProfilePage';
 import EventsPage from '../pages/EventsPage';
-
+// admin routes 
+import AddEvents from '../pages/AddEvents';
+import AddTeams from '../pages/AddTeams';
+import Login from '../pages/Login';
+import Register from '../pages/Register';
 
 const RedirectToHome = () => {
     const navigate = useNavigate();
@@ -27,6 +31,10 @@ const PageRoutes = () => {
             <Route exact path='/cabinet/:session/:name' element={<ProfilePage />} />
             <Route exact path='/events/:event' element={<EventsPage />} />
             <Route exact path='/events' element={<Events />} />
+            <Route exact path='/admin/addevent' element={<AddEvents />} />
+            <Route exact path='/admin/addteam' element={<AddTeams />} />
+            <Route exact path='/login' element={<Login />} />
+            <Route exact path='/register' element={<Register />} />
             <Route path='*' element={<Error404 />} />
         </Routes>
     )
