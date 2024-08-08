@@ -28,5 +28,10 @@ app.use('/api/event', eventRouter);
 app.use('/api/team', teamRouter);
 
 app.use(errorMiddleware);
-
+app.get("/", (req, res) => {
+    res.send("Welcome");
+  });
+  app.get("/health", (req, res) => {
+    res.status(200).json("Health checking");
+  });
 export default app;
