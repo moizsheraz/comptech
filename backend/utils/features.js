@@ -5,7 +5,7 @@ import {v2 as cloudinary} from 'cloudinary';
 
 const UploadFilesCloudinary = async (file, folder) => {
     try {
-        return await cloudinary.uploader.upload(getBase64(file), {
+        return await cloudinary.uploader.upload(file, {
             folder: folder,
             resource_type: "auto",
             public_id: uuid(),

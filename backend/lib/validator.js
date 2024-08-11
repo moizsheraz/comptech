@@ -16,8 +16,11 @@ const validateHandler = (req, res, next) => {
 // User Validators
 const registerValidator = () => [
     body("name", "Please Enter Username").notEmpty(),
+    body("password", "Please Enter Password").notEmpty(),
     body("about", "Please Enter About").notEmpty(),
-    body("currentPosition", "Please Enter Current Position").notEmpty(),
+    body("email", "Please Enter Your Email").notEmpty(),
+    body("session", "Please Enter Session").notEmpty(),
+    body("department", "Please Enter Department").notEmpty(),
 ];
 
 const loginValidator = () => [

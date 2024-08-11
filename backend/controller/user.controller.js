@@ -6,38 +6,46 @@ import { generateTokenFromid } from "../utils/generateToken.js";
 
 
 const registerUser = TryCatch(async (req, res, next) => {
-    const { name, about, currentPosition } = req.body;
-    let userData = { name, about, currentPosition };
+       
+    const { name, about, email, session, department, password, avatar } = req.body;
 
-    if (req.body?.socialmedia) {
-        const socialMedia = JSON.parse(req.body.socialmedia);
-        userData.socialMedia = socialMedia;
-    }
+    const existedName = await User.findOne({ name });
+    if (existedName) return next(new ErrorHandler('Username already exists', 400));
 
-    if (req.body?.career) {
-        const career = JSON.parse(req.body.career);
-        userData.career = career;
-    }
+    const result = await UploadFilesCloudinary(avatar, "user");
+    if (!result) return next(new ErrorHandler('Image upload failed', 400));
 
-    if (req.body?.password) {
-        userData.password = req.body.password;
-    }
+    let userData = { name, about, email, session, department, password , avatar: { public_id: result.public_id, url: result.secure_url } };
 
-    if (req?.file) {
-        const folder = "user";
-        const result = await UploadFilesCloudinary(req.file, folder);
-        if (!result) return next(new ErrorHandler('Image upload failed', 400));
+    // if (req.body?.socialmedia) {
+    //     const socialMedia = JSON.parse(req.body.socialmedia);
+    //     userData.socialMedia = socialMedia;
+    // }
 
-        userData.img = {
-            public_id: result.public_id,
-            url: result.secure_url
-        };
-    }
+    // if (req.body?.career) {
+    //     const career = JSON.parse(req.body.career);
+    //     userData.career = career;
+    // }
+
+    // if (req.body?.password) {
+    //     userData.password = req.body.password;
+    // }
+
+    // if (req?.file) {
+    //     const folder = "user";
+    //     const result = await UploadFilesCloudinary(req.file, folder);
+    //     if (!result) return next(new ErrorHandler('Image upload failed', 400));
+
+    //     userData.img = {
+    //         public_id: result.public_id,
+    //         url: result.secure_url
+    //     };
+    // }
 
     const user = await User.create(userData);
     if (!user) {
-        if (userData.img && userData.img.public_id) {
-            await DeleteFileCloudinary(userData.img.public_id);
+        if (userData.avatar && userData.avatar.public_id) {
+            await DeleteFileCloudinary(userData.avatar.public_id);
         }
         return next(new ErrorHandler('User creation failed', 400));
     }
@@ -101,8 +109,8 @@ const deleteUser = TryCatch(async (req, res, next) => {
 
     if (user._id.toString() === req.user._id.toString()) return next(new ErrorHandler('You cannot delete yourself', 400));
 
-    if (user.img) {
-        await DeleteFileCloudinary(user.img.public_id);
+    if (user.avatar) {
+        await DeleteFileCloudinary(user.avatar.public_id);
     }
 
     await User.findByIdAndDelete(id);
@@ -133,45 +141,45 @@ const updateUser = TryCatch(async (req, res, next) => {
         return next(new ErrorHandler("User not found", 404));
     }
 
-    // Check if socialMedia is provided in the update
-    if (updateData.socialMedia) {
-        // Case 1: Update specific social media object
-        if (updateData.socialMedia._id) {
-            const index = user.socialMedia.findIndex(s => s._id.toString() === updateData.socialMedia._id.toString());
-            if (index !== -1) {
-                // Update existing social media object
-                user.socialMedia[index] = { ...user.socialMedia[index], ...updateData.socialMedia };
-            } else {
-                // Add new social media object if platform not found
-                user.socialMedia.push(updateData.socialMedia);
-            }
-        }
-        // Case 2: Replace entire socialMedia array
-        else if (Array.isArray(updateData.socialMedia)) {
-            user.socialMedia = updateData.socialMedia;
-        }
-        delete updateData.socialMedia; // Prevent re-updating
-    }
+    // // Check if socialMedia is provided in the update
+    // if (updateData.socialMedia) {
+    //     // Case 1: Update specific social media object
+    //     if (updateData.socialMedia._id) {
+    //         const index = user.socialMedia.findIndex(s => s._id.toString() === updateData.socialMedia._id.toString());
+    //         if (index !== -1) {
+    //             // Update existing social media object
+    //             user.socialMedia[index] = { ...user.socialMedia[index], ...updateData.socialMedia };
+    //         } else {
+    //             // Add new social media object if platform not found
+    //             user.socialMedia.push(updateData.socialMedia);
+    //         }
+    //     }
+    //     // Case 2: Replace entire socialMedia array
+    //     else if (Array.isArray(updateData.socialMedia)) {
+    //         user.socialMedia = updateData.socialMedia;
+    //     }
+    //     delete updateData.socialMedia; // Prevent re-updating
+    // }
 
-    // Check if career is provided in the update
-    if (updateData.career) {
-        // Case 1: Update specific career object by unique identifier (e.g., id)
-        if (updateData.career._id) {
-            const index = user.career.findIndex(c => c._id.toString() === updateData.career._id.toString());
-            if (index !== -1) {
-                // Update existing career object by id
-                user.career[index] = { ...user.career[index], ...updateData.career };
-            } else {
-                // Optionally handle the case where the id does not exist
-                user.career.push(updateData.career);
-            }
-        }
-        // Case 2: Replace entire career array
-        else if (Array.isArray(updateData.career)) {
-            user.career = updateData.career;
-        }
-        delete updateData.career; // Prevent re-updating
-    }
+    // // Check if career is provided in the update
+    // if (updateData.career) {
+    //     // Case 1: Update specific career object by unique identifier (e.g., id)
+    //     if (updateData.career._id) {
+    //         const index = user.career.findIndex(c => c._id.toString() === updateData.career._id.toString());
+    //         if (index !== -1) {
+    //             // Update existing career object by id
+    //             user.career[index] = { ...user.career[index], ...updateData.career };
+    //         } else {
+    //             // Optionally handle the case where the id does not exist
+    //             user.career.push(updateData.career);
+    //         }
+    //     }
+    //     // Case 2: Replace entire career array
+    //     else if (Array.isArray(updateData.career)) {
+    //         user.career = updateData.career;
+    //     }
+    //     delete updateData.career; // Prevent re-updating
+    // }
 
     // Update other fields
     Object.keys(updateData).forEach(key => {
@@ -197,9 +205,9 @@ const updateUserImage = TryCatch(async (req, res, next) => {
     const result = await UploadFilesCloudinary(file, folder);
     if (!result) return next(new ErrorHandler('Image upload failed', 400));
 
-    await DeleteFileCloudinary(user.img.public_id);
+    await DeleteFileCloudinary(user.avatar.public_id);
 
-    user.img = {
+    user.avatar = {
         public_id: result.public_id,
         url: result.secure_url
     };
