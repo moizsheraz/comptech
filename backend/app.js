@@ -13,12 +13,10 @@ const corsOptions = {
   origin: "*",
 };
 
-app.use(
-  cors({
-    origin: "*",
-    credentials: true,
-  })
-);
+app.use(cors({
+  origin: ['http://localhost:5173'],
+  credentials: true
+}));
 
 cloudinaryConfig({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,

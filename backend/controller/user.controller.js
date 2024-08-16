@@ -6,24 +6,19 @@ import { generateTokenFromid } from "../utils/generateToken.js";
 
 
 const registerUser = TryCatch(async (req, res, next) => {
-    const { name, about, currentPosition } = req.body;
-    let userData = { name, about, currentPosition };
+    const { name, email, password, session, department, about } = req.body;
+    
+    let userData = {
+        name,
+        email,
+        password,
+        session,
+        department,
+        about
+    };
+ 
 
-    if (req.body?.socialmedia) {
-        const socialMedia = JSON.parse(req.body.socialmedia);
-        userData.socialMedia = socialMedia;
-    }
-
-    if (req.body?.career) {
-        const career = JSON.parse(req.body.career);
-        userData.career = career;
-    }
-
-    if (req.body?.password) {
-        userData.password = req.body.password;
-    }
-
-    if (req?.file) {
+    if (req.file) {
         const folder = "user";
         const result = await UploadFilesCloudinary(req.file, folder);
         if (!result) return next(new ErrorHandler('Image upload failed', 400));
@@ -34,29 +29,35 @@ const registerUser = TryCatch(async (req, res, next) => {
         };
     }
 
-    const user = await User.create(userData);
-    if (!user) {
-        if (userData.img && userData.img.public_id) {
-            await DeleteFileCloudinary(userData.img.public_id);
-        }
-        return next(new ErrorHandler('User creation failed', 400));
-    }
+    try {
+        const user = await User.create(userData);
 
-    return res.status(201).json({
-        success: true,
-        message: 'User created successfully',
-        data: user
-    });
+        if (!user) {
+            if (userData.img && userData.img.public_id) {
+                await DeleteFileCloudinary(userData.img.public_id);
+            }
+            return next(new ErrorHandler('User creation failed', 400));
+        }
+
+        return res.status(201).json({
+            success: true,
+            message: 'User created successfully',
+            data: user
+        });
+    } catch (error) {
+        return next(new ErrorHandler('Internal Server Error', 500));
+    }
 });
+
 
 const loginUser = TryCatch(async (req, res, next) => {
     const { name, password } = req.body;
 
     const user = await User.findOne({ name }).select('+password');
-    if (!user) return next(new ErrorHandler('Invalid Username', 401));
+    if (!user) return next(new ErrorHandler('Invalid Username or Password', 401));
 
     const isPasswordMatched = await user.isPasswordCorrect(password);
-    if (!isPasswordMatched) return next(new ErrorHandler('Invalid Password', 401));
+    if (!isPasswordMatched) return next(new ErrorHandler('Invalid Username or Password', 401));
 
     const token = generateTokenFromid(user._id);
     if (!token) return next(new ErrorHandler('Token generation failed', 500));

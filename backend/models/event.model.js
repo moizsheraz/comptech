@@ -5,8 +5,7 @@ const eventSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    img:
-    {
+    img: {
         public_id: {
             type: String,
         },
@@ -18,6 +17,9 @@ const eventSchema = new mongoose.Schema({
         type: Date,
         required: true
     },
+    time: {
+        type: String, // Assuming time is stored as a string in HH:mm format
+    },
     location: {
         type: String,
         required: true
@@ -27,8 +29,9 @@ const eventSchema = new mongoose.Schema({
         required: true
     },
     spokesPerson: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+        // type: mongoose.Schema.Types.ObjectId,
+        // ref: 'User',
+        type:String,
         required: true
     },
     isFeatured: {

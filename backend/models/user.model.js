@@ -25,7 +25,7 @@ const userSchema = new mongoose.Schema({
     },
     currentPosition: {
         type: String,
-        required: true
+        default:"Member"
     },
     socialMedia: [
         {

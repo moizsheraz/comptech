@@ -6,6 +6,6 @@ const multerUpload = multer({
     }
 });
 
-const singleUpload = multerUpload.single("image");
+const singleUpload = multerUpload.single("recfile");
 
 export {singleUpload};
