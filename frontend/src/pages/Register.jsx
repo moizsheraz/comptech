@@ -73,7 +73,7 @@ const Register = () => {
             Swal.fire({
                 icon: 'error',
                 title: 'An Error Occurred',
-                text: error.message,
+                text: response.data.message 
             });
         }
     };
@@ -94,7 +94,7 @@ const Register = () => {
                 </div>
                 <div className="inputForm">
                     <HiOutlineMail />
-                    <input type="text" autoComplete={"true"} value={email} onChange={(e) => setEmail(e.target.value)} className="input" placeholder="22-CS-49@students.uettaxila.edu.pk" required />
+                    <input type="email" autoComplete={"true"} value={email} onChange={(e) => setEmail(e.target.value)} className="input" placeholder="22-CS-49@students.uettaxila.edu.pk" required />
                 </div>
                 <div className="flex-column">
                     <label>Session</label>

@@ -49,7 +49,7 @@ function Login() {
             Swal.fire({
                 icon: 'error',
                 title: 'An Error Occurred',
-                text: error.message,
+                text: 'Invalid Username or Password',
             });
         }
     };
