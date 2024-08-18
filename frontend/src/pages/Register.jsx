@@ -20,7 +20,8 @@ const Register = () => {
     const [confirmpassword, setConfirmPassword] = useState("");
     const [name, setName] = useState("");
     const [passwordShown, setPasswordShown] = useState(false);
-    const [avatar, setAvatar] = useState(null);
+    const [avatar, setAvatar] = useState('');
+    const [avatarPreview, setAvatarPreview] = useState('');
     const [session, setSession] = useState("");
     const [department, setDepartment] = useState("");
     const [about, setAbout] = useState("");
@@ -43,7 +44,8 @@ const Register = () => {
             password,
             session,
             department,
-            about
+            about,
+            avatar
         };
 
         try {
@@ -77,6 +79,17 @@ const Register = () => {
             });
         }
     };
+    const handleImageChange=(e)=>{
+        const reader = new FileReader();
+        reader.onload = () => {
+          if (reader.readyState === 2) {
+            setAvatarPreview(reader.result);
+            setAvatar(reader.result);
+          }
+        };
+  
+        reader.readAsDataURL(e.target.files[0]);
+    }
 
     return (
         <div className="login_signup_container bg-slate-200">
@@ -184,17 +197,14 @@ const Register = () => {
                         id="fileInput"
                         accept='image/*'
                         className="invisible"
-                        onChange={(e) => {
-                            const file = e.target.files[0];
-                            if (file) {
-                                setAvatar(file);
-                            }
-                        }}
+                        onChange={handleImageChange}
                     />
+
+
                     <label htmlFor="fileInput" className="cursor-pointer">
                         <div className="flex items-center">
                             {
-                                avatar ? <img src={URL.createObjectURL(avatar)} className="h-16 w-16 rounded-full object-cover object-top border-2 p-1 border-slate-800" alt="" /> : <div className="p-2 bg-blue-500 text-white rounded-full">
+                                avatar ? <img src={avatarPreview} className="h-16 w-16 rounded-full object-cover object-top border-2 p-1 border-slate-800" alt="" /> : <div className="p-2 bg-blue-500 text-white rounded-full">
                                     <FcAddImage className="h-6 w-6" />
                                 </div>
                             }
