@@ -15,12 +15,13 @@ import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmpassword, setConfirmPassword] = useState("");
     const [name, setName] = useState("");
     const [passwordShown, setPasswordShown] = useState(false);
-    const [avatar, setAvatar] = useState('');
+    const [avatar, setAvatar] = useState();
     const [avatarPreview, setAvatarPreview] = useState('');
     const [session, setSession] = useState("");
     const [department, setDepartment] = useState("");
@@ -28,7 +29,7 @@ const Register = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+        setLoading(true);
         if (password !== confirmpassword) {
             Swal.fire({
                 icon: 'error',
@@ -37,24 +38,21 @@ const Register = () => {
             });
             return;
         }
-
-        const userData = {
-            name,
-            email,
-            password,
-            session,
-            department,
-            about,
-            avatar
-        };
+        const Formdata = new FormData();
+        Formdata.append('name', name);
+        Formdata.append('email', email);
+        Formdata.append('password', password);
+        Formdata.append('session', session);
+        Formdata.append('department', department);
+        Formdata.append('about', about);
+        Formdata.append('image', avatar);
 
         try {
-            const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/user/register`, userData, {
+            const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/user/register`, Formdata, {
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'multipart/form-data',
                 }
             });
-            const userInfo = response.data;
 
             if (response.status === 200 || response.status === 201) {
                 Swal.fire({
@@ -62,7 +60,6 @@ const Register = () => {
                     title: 'Registration Successful',
                     text: response.data.message,
                 });
-
                 navigate('/login');
             } else {
                 Swal.fire({
@@ -75,8 +72,10 @@ const Register = () => {
             Swal.fire({
                 icon: 'error',
                 title: 'An Error Occurred',
-                text: response.data.message 
+                text: error.response.data.message || 'An error occurred', 
             });
+        } finally {
+            setLoading(false);
         }
     };
     const handleImageChange=(e)=>{
@@ -84,7 +83,7 @@ const Register = () => {
         reader.onload = () => {
           if (reader.readyState === 2) {
             setAvatarPreview(reader.result);
-            setAvatar(reader.result);
+            setAvatar(e.target.files[0]);
           }
         };
   
@@ -198,6 +197,7 @@ const Register = () => {
                         accept='image/*'
                         className="invisible"
                         onChange={handleImageChange}
+                        required
                     />
 
 
@@ -212,9 +212,11 @@ const Register = () => {
                         </div>
                     </label>
                 </div>
-                <button type="submit" className="button-submit">Sign Up</button>
+                <button type="submit" className="button-submit" disabled={loading}>Sign Up</button>
                 <p className="p">
-                    Already a comptechian! <Link to={"/login"} className="span">Sign in</Link>
+                   <button disabled={loading}>
+                   Already a comptechian! <Link to={"/login"} className="span">Sign in</Link>
+                   </button>
                 </p>
             </form>
         </div>

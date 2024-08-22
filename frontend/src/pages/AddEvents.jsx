@@ -6,6 +6,7 @@ import Swal from 'sweetalert2';
 import axios from "axios";
 
 function AddEvents() {
+    const [loading, setLoading] = useState(false);
     const [keyPoints, setKeyPoints] = useState([]);
     const [title, settitle] = useState("");
     const [date, setdate] = useState("");
@@ -14,6 +15,7 @@ function AddEvents() {
     const [description, setdescription] = useState("");
     const [spokesPerson, setspokesPerson] = useState("");
     const [isFeatured, setisFeatured] = useState(false);
+    const [eventimg, seteventimg] = useState();
     const [category, setcategory] = useState("");
     const [collaboration, setcollaboration] = useState("");
 
@@ -35,36 +37,49 @@ function AddEvents() {
         setKeyPoints(newKeyPoints);
     };
 
+
+    const handleImageChange=(e)=>{
+            // const reader = new FileReader();
+            // reader.onload = () => {
+            //     if (reader.readyState === 2) {
+            //         seteventimg(reader.result);
+            //     }
+            // }
+            // reader.readAsDataURL(e.target.files[0]);
+            seteventimg(e.target.files[0]);
+    }
+    console.log(eventimg);
+    
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
 
-        const eventData = {
-            title,
-            date,
-            time,
-            location,
-            description,
-            spokesPerson,
-            isFeatured,
-            category,
-        };
-
+        const formdata = new FormData();
+        formdata.append('image', eventimg);
+        formdata.append('title', title);
+        formdata.append('date', date);
+        formdata.append('time', time);
+        formdata.append('location', location);
+        formdata.append('description', description);
+        formdata.append('spokesPerson', spokesPerson);
+        formdata.append('isFeatured', isFeatured);
+        formdata.append('category', category);
+        
         if (keyPoints.length > 0) {
             const jsonConvertedKeyPoints = JSON.stringify(keyPoints);
-            eventData.keyPoints = jsonConvertedKeyPoints;
+            formdata.append('keyPoints', jsonConvertedKeyPoints);
         }
-
         if (collaboration) {
-            eventData.collaboration = collaboration;
+            formdata.append('collaboration', collaboration);
         }
         
         try {
-            const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/event/create`, eventData, {
-                  headers: {
-                      'Content-Type': 'application/json'
-                  }
-              });
-  
+            const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/event/create`, formdata, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+            }});
+            
               if (response.status === 200 || response.status === 201) {
                   Swal.fire({
                       icon: 'success',
@@ -84,6 +99,8 @@ function AddEvents() {
                 title: 'An Error Occurred',
                 text: error.message,
             });
+        } finally{
+            setLoading(false);
         }
     };
 
@@ -104,11 +121,11 @@ function AddEvents() {
                                         <label className="leading-loose">Event Title</label>
                                         <input
                                             type="text"
-                                            required
                                             className="px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600"
                                             placeholder="Event title"
                                             value={title}
                                             onChange={(e) => settitle(e.target.value)}
+                                            required
                                         />
                                     </div>
                                     <div className="flex flex-col">
@@ -116,9 +133,10 @@ function AddEvents() {
                                         <input
                                             type="file"
                                             id="fileInput"
-                                            accept='image/*'
                                             className="px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600"
                                             placeholder="Optional"
+                                            required
+                                            onChange={handleImageChange}
                                         />
                                     </div>
                                     <div className="flex items-center gap-4">
@@ -129,9 +147,9 @@ function AddEvents() {
                                                     type="date"
                                                     className="pr-4 pl-10 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600"
                                                     placeholder="25/02/2020"
-                                                    required
                                                     value={date}
                                                     onChange={(e) => setdate(e.target.value)}
+                                                    required
                                                 />
                                                 <div className="absolute left-3 top-2">
                                                     <svg
@@ -156,11 +174,11 @@ function AddEvents() {
                                             <div className="relative focus-within:text-gray-600 text-gray-400">
                                                 <input
                                                     type="time"
-                                                    required
                                                     className="pr-4 pl-10 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600"
                                                     placeholder="26/02/2020"
                                                     value={time}
                                                     onChange={(e) => settime(e.target.value)}
+                                                    required
                                                 />
                                                 <div className="absolute left-3 top-2">
                                                     <CiStopwatch className="w-6 h-6" />
@@ -172,22 +190,22 @@ function AddEvents() {
                                         <label className="leading-loose">Event Location</label>
                                         <input
                                             type="text"
-                                            required
                                             className="px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600"
                                             placeholder="Event Location"
                                             value={location}
                                             onChange={(e) => setlocation(e.target.value)}
+                                            required
                                         />
                                     </div>
                                     <div className="flex flex-col">
                                         <label className="leading-loose">Event Description</label>
                                         <input
                                             type="text"
-                                            required
                                             className="px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600"
                                             placeholder="Event Description"
                                             value={description}
                                             onChange={(e) => setdescription(e.target.value)}
+                                            required
                                         />
                                     </div>
 
@@ -196,11 +214,11 @@ function AddEvents() {
                                         <label className="leading-loose">Speaker</label>
                                         <input
                                             type="text"
-                                            required
                                             className="px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600"
                                             placeholder="Dr. Aun Irtiza"
                                             value={spokesPerson}
                                             onChange={(e) => setspokesPerson(e.target.value)}
+                                            required
                                         />
                                     </div>
 
@@ -237,11 +255,11 @@ function AddEvents() {
                                         <label className="leading-loose">Category</label>
                                         <input
                                             type="text"
-                                            required
                                             className="px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600"
                                             placeholder="Event Category"
                                             value={category}
                                             onChange={(e) => setcategory(e.target.value)}
+                                            required
                                         />
                                     </div>
                                     <div className="flex flex-col">
@@ -295,7 +313,7 @@ function AddEvents() {
                                     {/* end points */}
                                 </div>
                                 <div className="pt-4 flex items-center space-x-4">
-                                    <button type="submit" className="bg-blue-500 flex justify-center items-center w-full text-white px-4 py-3 rounded-md focus:outline-none">
+                                    <button type="submit" className="bg-blue-500 flex justify-center items-center w-full text-white px-4 py-3 rounded-md focus:outline-none" disabled={loading}>
                                         Create Event
                                     </button>
                                 </div>
