@@ -29,7 +29,7 @@ const PageRoutes = () => {
             <Route exact path='/home' element={<RedirectToHome />} />
             <Route exact path='/cabinet' element={<Cabinet />} />
             <Route exact path='/cabinet/:session/:name' element={<ProfilePage />} />
-            <Route exact path='/events/:event' element={<EventsPage />} />
+            <Route exact path='/events/:id' element={<EventsPage />} />
             <Route exact path='/events' element={<Events />} />
             <Route exact path='/admin/addevent' element={<AddEvents />} />
             <Route exact path='/admin/addteam' element={<AddTeams />} />

@@ -1,5 +1,6 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
+import axios from "axios";
 
 
 // swiper js import
@@ -17,8 +18,25 @@ import Events from '../Data/EventData.js'; // data for event
 
 
 const Event = () => {
-    let featured = Events.filter((event) => event?.isfeatured == true);
-    let allevents = Events.filter((event) => event?.isfeatured == false);
+    const [events, setevents] = useState([]);
+
+    const fetchEvents = async () => {
+        try {
+            const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/event/all`);
+            setevents(response.data);
+        } catch (err) {
+            console.error('Error fetching events:', err);
+            setError(err);
+        }
+    };
+
+    useEffect(()=> {
+        fetchEvents();
+    }, []);
+    
+    let featured = events?.data?.filter((event) => event?.isFeatured == true);
+    let allevents = events?.data?.filter((event) => event?.isFeatured == false);
+    
     return (
 
 
@@ -53,20 +71,20 @@ const Event = () => {
                                                     {/* Profile Picture */}
                                                     <div>
                                                         <img
-                                                            src={data.eventCover}
+                                                            src={data?.img?.url}
                                                             className="md:max-w-20 md:max-h-20  rounded-md w-28 h-28"
                                                         />
                                                     </div>
                                                     {/* Description */}
                                                     <div className="col-span-5 md:col-span-4 ml-4">
-                                                        <p className="text-sky-500 font-bold text-xs">{data.event}</p>
+                                                        <p className="text-sky-500 font-bold text-xs">{data.title}</p>
                                                         <p className="text-gray-600 font-bold  select-text md:text-sm text-xs">
-                                                            {data.eventDescription.length > 100 ? data.eventDescription.slice(0, 100) + "..." : data.eventDescription}
+                                                            {data.description.length > 100 ? data.description.slice(0, 100) + "..." : data.description}
                                                         </p>
-                                                        <p className="text-gray-400 md:text-sm text-xs"> {data.eventdate}</p>
-                                                        <p className="text-gray-400 mt-2 md:text-sm text-xs">Venue : {data.venue}</p>
-                                                        <p className="text-gray-500  select-text md:text-sm text-xs">Speaker : {data.speakername} </p>
-                                                        <p className="text-gray-400  select-text md:text-sm text-xs"> {data.currentPost} </p>
+                                                        <p className="text-gray-400 md:text-sm text-xs"> {data.date}</p>
+                                                        <p className="text-gray-400 mt-2 md:text-sm text-xs">Venue : {data.location}</p>
+                                                        <p className="text-gray-500  select-text md:text-sm text-xs">Speaker : {data.spokesPerson} </p>
+                                                        {/* <p className="text-gray-400  select-text md:text-sm text-xs"> {data.currentPost} </p> */}
                                                     </div>
                                                 </div>
                                             </div>
@@ -111,20 +129,20 @@ const Event = () => {
                                 allevents?.map((data, index) => {
                                     return (
                                         <SwiperSlide key={index} className='w-fit bg-comptech-950 rounded-xl border-b-4 border-slate-600 hover:scale-95'><Link
-                                            to={`/events/${data.event}`}
+                                            to={`/events/${data._id}`}
                                             className="w-fit"
                                         >
                                             <div className="flex flex-nowrap w-full m-auto p-5 gap-2 items-center">
 
                                                 <div>
-                                                    <img src={data.eventCover} alt="" className="w-16    md:w-20  bg-comptech-100 rounded-md text-comptech-950 object-contain" />
+                                                    <img src={data?.img?.url} alt="" className="w-16    md:w-20  bg-comptech-100 rounded-md text-comptech-950 object-contain" />
                                                 </div>
                                                 <div className="w-full  col-span-5">
-                                                    <p className="text-comptech-100 font-bold text-xs">{data.EventCategory}</p>
-                                                    <p className="text-slate-200 font-bold">{data.event.length > 20 ? data.event.slice(0, 26) + "..." : data.event}</p>
-                                                    {data.collabs && <p className="text-gray-400 text-sm"><span className='text-gray-400 font-bold'>Collabs:</span>  {data.collabs} </p>}
-                                                    <p className="text-gray-400 text-sm">Speaker : {data.speakername}</p>
-                                                    <p className="text-red-500 text-xs">Held : {data.eventdate}</p>
+                                                    <p className="text-comptech-100 font-bold text-xs">{data.category}</p>
+                                                    <p className="text-slate-200 font-bold">{data.title.length > 20 ? data.title.slice(0, 26) + "..." : data.title}</p>
+                                                    {data?.collaboration && <p className="text-gray-400 text-sm"><span className='text-gray-400 font-bold'>Collabs:</span>  {data?.collaboration} </p>}
+                                                    <p className="text-gray-400 text-sm">Speaker : {data.spokesPerson}</p>
+                                                    <p className="text-red-500 text-xs">Held : {data.date}</p>
                                                 </div>
                                             </div>
                                         </Link></SwiperSlide>

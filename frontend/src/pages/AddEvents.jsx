@@ -48,9 +48,7 @@ function AddEvents() {
             // reader.readAsDataURL(e.target.files[0]);
             seteventimg(e.target.files[0]);
     }
-    console.log(eventimg);
     
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
