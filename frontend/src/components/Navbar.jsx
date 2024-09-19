@@ -98,7 +98,7 @@ const Navbar = () => {
                                     {
                                         open ? <><div className="px-2 pt-2 pb-4 bg-white rounded-md shadow-lg dark:bg-gray-700">
                                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                                <Link className="flex row items-start rounded-lg bg-transparent p-2 dark:hover:bg-gray-600 dark:focus:bg-gray-600 dark:focus:text-white dark:hover:text-white dark:text-gray-200 text-comptech-950 hover:text-gray-900 focus:text-comptech-950 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none focus:shadow-outline" to={"/teams/management"}>
+                                                <Link className="flex row items-start rounded-lg bg-transparent p-2 dark:hover:bg-gray-600 dark:focus:bg-gray-600 dark:focus:text-white dark:hover:text-white dark:text-gray-200 text-comptech-950 hover:text-gray-900 focus:text-comptech-950 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none focus:shadow-outline" to={"/teams/Management"} >
                                                     <div className="bg-comptech-100 text-white rounded-lg p-3">
                                                         <MdManageAccounts />
                                                     </div>
@@ -107,7 +107,7 @@ const Navbar = () => {
                                                     </div>
                                                 </Link>
 
-                                                <Link className="flex row items-start rounded-lg bg-transparent p-2 dark:hover:bg-gray-600 dark:focus:bg-gray-600 dark:focus:text-white dark:hover:text-white text-comptech-950 dark:text-gray-200 hover:text-gray-900 focus:text-comptech-950 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none focus:shadow-outline" to={"/teams/logistics"}>
+                                                <Link className="flex row items-start rounded-lg bg-transparent p-2 dark:hover:bg-gray-600 dark:focus:bg-gray-600 dark:focus:text-white dark:hover:text-white text-comptech-950 dark:text-gray-200 hover:text-gray-900 focus:text-comptech-950 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none focus:shadow-outline" to={"/teams/Logistics"} >
                                                     <div className="bg-comptech-100 text-white rounded-lg p-3">
                                                         <TbTruckDelivery />
                                                     </div>
@@ -115,7 +115,7 @@ const Navbar = () => {
                                                         <p className="font-semibold">Logistics</p>
                                                     </div>
                                                 </Link>
-                                                <Link className="flex row items-start rounded-lg bg-transparent p-2 dark:hover:bg-gray-600 dark:focus:bg-gray-600 text-comptech-950 dark:text-gray-200 dark:focus:text-white dark:hover:text-white hover:text-gray-900 focus:text-comptech-950 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none focus:shadow-outline" to={"/teams/devs"}>
+                                                <Link className="flex row items-start rounded-lg bg-transparent p-2 dark:hover:bg-gray-600 dark:focus:bg-gray-600 text-comptech-950 dark:text-gray-200 dark:focus:text-white dark:hover:text-white hover:text-gray-900 focus:text-comptech-950 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none focus:shadow-outline" to={"/teams/DevOps"} >
                                                     <div className="bg-comptech-100 text-white rounded-lg p-3">
                                                         <SiAzuredevops />
                                                     </div>

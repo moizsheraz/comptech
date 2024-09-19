@@ -13,6 +13,7 @@ import AddEvents from '../pages/AddEvents';
 import AddTeams from '../pages/AddTeams';
 import Login from '../pages/Login';
 import Register from '../pages/Register';
+import Teams from '../pages/Teams';
 
 const RedirectToHome = () => {
     const navigate = useNavigate();
@@ -30,6 +31,7 @@ const PageRoutes = () => {
             <Route exact path='/cabinet' element={<Cabinet />} />
             <Route exact path='/cabinet/:session/:name' element={<ProfilePage />} />
             <Route exact path='/events/:id' element={<EventsPage />} />
+            <Route exact path='/teams/:name' element={<Teams />} />
             <Route exact path='/events' element={<Events />} />
             <Route exact path='/admin/addevent' element={<AddEvents />} />
             <Route exact path='/admin/addteam' element={<AddTeams />} />

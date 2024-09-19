@@ -8,13 +8,13 @@ import { CiInstagram, CiLinkedin, CiTwitter } from "react-icons/ci";
 const TeamMembar = (props) => {
     const member = props.member;
     return (
-        <div className="w-full md:w-6/12 lg:w-3/12 mb-6 px-6 sm:px-6 lg:px-4">
+        <div className="w-3/12 md:w-6/12 lg:w-full mb-6 px-6 sm:px-6 lg:px-4">
             <div className="flex flex-col">
                 {/* Avatar */}
                 <Link to={`/cabinet/${member.session}/${member.name}`} className="mx-auto">
                     <img
                         className="rounded-2xl drop-shadow-md hover:drop-shadow-xl transition-all duration-200 delay-100 h-52 w-64 object-cover object-top"
-                        src={member.img}
+                        src={member.img.url}
                     />
                 </Link>
                 {/* Details */}
@@ -25,36 +25,48 @@ const TeamMembar = (props) => {
                     </h1>
                     {/* Title */}
                     <div className="text-gray-700 font-light mb-2">
-                        {member.currentPost}
+                        {member.currentPosition}
                     </div>
                     {/* Social Icons */}
                     <div
                         className="flex items-center justify-center opacity-50 hover:opacity-100 transition-opacity duration-300"
                     >
+                        {member.socialMedia.map((social, index) => {
+                            return (
+                                <Link
+                                    key={social._id}
+                                    to={social.link}
+                                    target='_blank'
+                                    className="flex rounded-full hover:bg-blue-300 h-10 w-10 text-black  items-center justify-center"
+                                >
+                                    <CiLinkedin className="text-black hover:text-slate-900 text-lg" />
+                                </Link>
+                            )
+                        })}
                         {/* Linkedin */}
-                        <Link
+                        {/* <Link
                             to={member.linkedin}
                             target='_blank'
                             className="flex rounded-full hover:bg-blue-300 h-10 w-10 text-black  items-center justify-center"
                         >
                             <CiLinkedin className="text-black hover:text-slate-900 text-lg" />
-                        </Link>
+                        </Link> */}
                         {/* Twitter */}
-                        <Link
+                        {/* <Link
                             to={member.twitter}
                             target='_blank'
                             className="flex rounded-full hover:bg-sky-400 h-10 w-10 items-center justify-center"
                         >
                             <CiTwitter className="text-black hover:text-slate-900 text-lg" />
-                        </Link>
+                        </Link> */}
                         {/* Instagram */}
-                        <Link
+                        {/* <Link
                             to={member.instagram}
                             target='_blank'
                             className="flex rounded-full hover:bg-purple-300 h-10 w-10  items-center justify-center"
                         >
                             <CiInstagram className="text-black hover:text-slate-900 text-lg" />
-                        </Link>
+                        </Link> */}
                     </div>
                 </div>
             </div>
