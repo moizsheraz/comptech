@@ -37,31 +37,32 @@ const EventsPage = () => {
     useEffect(()=> {
         fetchEvents(id);
     }, []);
+    console.log(event);
     
     return (
         <div className="h-full bg-gray-200 p-8">
             <div className="bg-white rounded-lg shadow-xl pb-8">
                 <div className="w-full h-[250px] -translate-y-1">
-                    <img src={event?.data?.img?.url} className="w-full h-full rounded-tl-lg rounded-tr-lg object-cover object-top outline-none" />
+                    <img src={event?.data?.eventCover?.url} className="w-full h-full rounded-tl-lg rounded-tr-lg object-cover object-top outline-none" />
                 </div>
                 <div className="flex flex-col items-center -mt-20 select-none">
                     <img
-                        src={event?.data?.img?.url}
+                        src={event?.data?.spokesPerson?.image?.url}
                         className="w-40 border-4 border-white rounded-full z-10"
                     />
                     <div className="flex items-center space-x-2 mt-2">
-                        <p className="text-2xl select-all">{event?.data?.spokesPerson}</p>
+                        <p className="text-2xl select-all">{event?.data?.spokesPerson?.name}</p>
                     </div>
-                    <p className="text-gray-700">{event?.currentPost}</p>
-                    <p className="text-sm text-gray-500">{event?.data?.title}</p>
+                    {/* <p className="text-gray-700">{event?.currentPost}</p> */}
+                    <p className="text-sm text-gray-500">{event?.data?.spokesPerson?.description}</p>
                 </div>
             </div>
 
             {/* about block  */}
             <div className="flex-1 bg-white rounded-lg shadow-xl mt-4 p-8">
-                <h4 className="text-xl text-gray-900 font-bold">About {event?.data?.spokesPerson}</h4>
+                <h4 className="text-xl text-gray-900 font-bold">About {event?.data?.title}</h4>
                 <p className="mt-2 text-gray-700 select-all">
-                    {Event?.speakerdescription}
+                    {event?.data?.description}
                 </p>
             </div>
 
@@ -90,7 +91,7 @@ const EventsPage = () => {
 
 
             {
-                Event?.eventPics && Event?.eventPics?.length > 0 ? <div className="flex flex-col bg-white rounded-lg shadow-xl mt-4 p-8  overflow-hidden">
+                event?.data?.eventPics && event?.data?.eventPics?.length > 0 ? <div className="flex flex-col bg-white rounded-lg shadow-xl mt-4 p-8  overflow-hidden">
                     <h4 className="text-xl text-gray-900 font-bold pb-2">Event Moments</h4>
 
                     <Swiper
@@ -118,7 +119,7 @@ const EventsPage = () => {
                         className='w-[44vw] md:w-[86vw] flex items-center justify-center m-auto'
                     >
                         {
-                            Event?.eventPics?.map((data, index) => {
+                            event?.data?.eventPics?.map((data, index) => {
                                 return (
                                     <SwiperSlide key={index} className='w-fit md:w-full rounded-md cursor-pointer shadow-2xl flex items-center justify-center'>
 

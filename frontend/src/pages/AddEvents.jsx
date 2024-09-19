@@ -13,16 +13,17 @@ function AddEvents() {
     const [time, settime] = useState("");
     const [location, setlocation] = useState("");
     const [description, setdescription] = useState("");
-    const [spokesPerson, setspokesPerson] = useState("");
     const [isFeatured, setisFeatured] = useState(false);
     const [eventimg, seteventimg] = useState();
     const [category, setcategory] = useState("");
     const [collaboration, setcollaboration] = useState("");
+    const [spokesPersonName, setspokesPersonName] = useState("");
+    const [spokesPersonDescription, setspokesPersonDescription] = useState("");
+    const [spokesPersonImage, setspokesPersonImage] = useState();
+    const [spokesPersonSocials, setspokesPersonSocials] = useState([]);
 
     const addKeyPoint = () => {
         setKeyPoints([...keyPoints, { name: '', explanation: '' }]);
-        console.log(keyPoints);
-
     };
 
     const removeKeyPoint = (index) => {
@@ -37,33 +38,101 @@ function AddEvents() {
         setKeyPoints(newKeyPoints);
     };
 
+    const addSocial = () => {
+        setspokesPersonSocials([...spokesPersonSocials, { name: '', url: '' }]);
+    };
 
-    const handleImageChange=(e)=>{
-            // const reader = new FileReader();
-            // reader.onload = () => {
-            //     if (reader.readyState === 2) {
-            //         seteventimg(reader.result);
-            //     }
-            // }
-            // reader.readAsDataURL(e.target.files[0]);
-            seteventimg(e.target.files[0]);
+    const removeSocial = (index) => {
+        const newSocials = spokesPersonSocials.filter((_, i) => i !== index);
+        setspokesPersonSocials(newSocials);
+    };
+
+    const handleSocialInputChange = (index, field, value) => {
+        const newSocials = spokesPersonSocials.map((social, i) =>
+            i === index ? { ...social, [field]: value } : social
+        );
+        setspokesPersonSocials(newSocials);
+    };
+
+    const handleSpokesPersonImageChange = (e) => {
+        setspokesPersonImage(e.target.files[0]);
+    };
+
+
+    const handleImageChange = (e) => {
+        // const reader = new FileReader();
+        // reader.onload = () => {
+        //     if (reader.readyState === 2) {
+        //         seteventimg(reader.result);
+        //     }
+        // }
+        // reader.readAsDataURL(e.target.files[0]);
+        seteventimg(e.target.files[0]);
     }
-    
+
+    const validateForm = () => {
+        console.log(spokesPersonSocials);
+        
+        if (!date || !time || !location || !title || !collaboration || !description || !spokesPersonName || !spokesPersonDescription || !spokesPersonImage || spokesPersonSocials.length === 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Event Creation Failed',
+                text: "Please fill all the fields",
+            });
+            return false;
+        }
+        for (let social of spokesPersonSocials) {
+            if (!social.name || !social.url) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Event Creation Failed',
+                    text: "Please fill all the social media fields",
+                });
+                return false;
+            }
+        }
+        return true;
+    };
+
+    const resetForm = () => {
+        setdate("");
+        settime("");
+        setlocation("");
+        setdescription("");
+        setspokesPersonName("");
+        setspokesPersonDescription("");
+        setspokesPersonImage(null);
+        setspokesPersonSocials([]);
+        setisFeatured(false);
+        seteventimg(null);
+        setcategory("");
+        setcollaboration("");
+        setKeyPoints([]);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
+        if (!validateForm()) return;
+        
+        const spokesPerson = {
+            name: spokesPersonName,
+            description: spokesPersonDescription,
+            socials: spokesPersonSocials,
+        };
 
         const formdata = new FormData();
         formdata.append('image', eventimg);
+        formdata.append('person', spokesPersonImage);
         formdata.append('title', title);
         formdata.append('date', date);
         formdata.append('time', time);
         formdata.append('location', location);
         formdata.append('description', description);
-        formdata.append('spokesPerson', spokesPerson);
+        formdata.append('spokesPerson', JSON.stringify(spokesPerson));
         formdata.append('isFeatured', isFeatured);
         formdata.append('category', category);
-        
+
         if (keyPoints.length > 0) {
             const jsonConvertedKeyPoints = JSON.stringify(keyPoints);
             formdata.append('keyPoints', jsonConvertedKeyPoints);
@@ -71,33 +140,35 @@ function AddEvents() {
         if (collaboration) {
             formdata.append('collaboration', collaboration);
         }
-        
+
         try {
             const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/event/create`, formdata, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
-            }});
-            
-              if (response.status === 200 || response.status === 201) {
-                  Swal.fire({
-                      icon: 'success',
-                      title: 'Event Created Successfully',
-                      text: response.data.message,
-                  });
-              } else {
-                  Swal.fire({
-                      icon: 'error',
-                      title: 'Event Creation Failed',
-                      text: response.data.message || 'An error occurred',
-                  });
-              }
+                }
+            });
+
+            if (response.status === 200 || response.status === 201) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Event Created Successfully',
+                    text: response.data.message,
+                });
+                resetForm();
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Event Creation Failed',
+                    text: response.data.message || 'An error occurred',
+                });
+            }
         } catch (error) {
             Swal.fire({
                 icon: 'error',
                 title: 'An Error Occurred',
                 text: error.message,
             });
-        } finally{
+        } finally {
             setLoading(false);
         }
     };
@@ -209,18 +280,70 @@ function AddEvents() {
 
                                     {/* speaker can be anyone beshak wo databse mai nah hoo. Some times bahir sa speaker bula leta hain taht's why input text */}
                                     <div className="flex flex-col">
-                                        <label className="leading-loose">Speaker</label>
+                                        <label className="leading-loose">Speaker Name</label>
                                         <input
                                             type="text"
+                                            value={spokesPersonName}
                                             className="px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600"
-                                            placeholder="Dr. Aun Irtiza"
-                                            value={spokesPerson}
-                                            onChange={(e) => setspokesPerson(e.target.value)}
-                                            required
+                                            onChange={(e) => setspokesPersonName(e.target.value)}
+                                            placeholder="Spokesperson Name"
                                         />
                                     </div>
-
-
+                                    <div className="flex flex-col">
+                                        <label className="leading-loose">Speaker Description</label>
+                                        <textarea
+                                            value={spokesPersonDescription}
+                                            onChange={(e) => setspokesPersonDescription(e.target.value)}
+                                            className="px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600"
+                                            placeholder="Spokesperson Description"
+                                        />
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <label className="leading-loose">Speaker Image</label>
+                                        <input
+                                            type="file"
+                                            id="fileInput"
+                                            className="px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600"
+                                            placeholder="Optional"
+                                            required
+                                            onChange={handleSpokesPersonImageChange}
+                                        />
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <label className="leading-loose">Social Media Links</label>
+                                        <button
+                                            type="button"
+                                            onClick={addSocial}
+                                            className="flex items-center px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600"
+                                        >
+                                            <FaPlus className="mr-2" /> Add Social Media Links
+                                        </button>
+                                        {spokesPersonSocials.map((social, index) => (
+                                            <div key={index} className="flex flex-row items-center space-x-4 mt-4">
+                                                <input
+                                                    type="text"
+                                                    value={social.name}
+                                                    onChange={(e) => handleSocialInputChange(index, 'name', e.target.value)}
+                                                    className="px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600"
+                                                    placeholder="Name"
+                                                />
+                                                <input
+                                                    type="text"
+                                                    value={social.url}
+                                                    onChange={(e) => handleSocialInputChange(index, 'url', e.target.value)}
+                                                    className="px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600"
+                                                    placeholder="Link"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeSocial(index)}
+                                                    className="text-gray-400"
+                                                >
+                                                    <FaTimes />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
                                     <div className="flex flex-col">
                                         <label className="leading-loose">Featured</label>
                                         <div className="flex flex-row space-x-4">
