@@ -131,7 +131,7 @@ const Register = () => {
                 position = 'Executive';
                 break;
             case `${currentYear - 2}`:
-                position = 'Assistant Director';
+                position = 'Assistent Director';
                 break;
             case `${currentYear - 3}`:
                 position = 'Cabinet';
@@ -204,6 +204,7 @@ const Register = () => {
                         <option value="Media">Media</option>
                         <option value="DevOps">DevOps</option>
                         <option value="HR">HR</option>
+                        <option value="Left">Left</option>
                     </select>
                 </div>
                 <div className="flex-column">

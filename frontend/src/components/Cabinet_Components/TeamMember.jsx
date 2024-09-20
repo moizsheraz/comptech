@@ -11,7 +11,7 @@ const TeamMembar = (props) => {
         <div className="w-3/12 md:w-6/12 lg:w-full mb-6 px-6 sm:px-6 lg:px-4">
             <div className="flex flex-col">
                 {/* Avatar */}
-                <Link to={`/cabinet/${member.session}/${member.name}`} className="mx-auto">
+                <Link to={`/profile/${member.name}`} className="mx-auto">
                     <img
                         className="rounded-2xl drop-shadow-md hover:drop-shadow-xl transition-all duration-200 delay-100 h-52 w-64 object-cover object-top"
                         src={member.img.url}
