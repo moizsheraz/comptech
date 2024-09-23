@@ -16,36 +16,53 @@ import { Autoplay } from 'swiper/modules';
 // Import Swiper styles
 import 'swiper/css';
 import 'swiper/css/autoplay';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
 
 
 const EventsPage = () => {
-    let { event } = useParams();
+    let { id } = useParams();
+    
+    const [event, setevent] = useState([]);
 
-    let Event = Events?.find((Event) => Event?.event == event);
+    const fetchEvents = async (id) => {
+        try {
+            const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/event/single/${id}`);
+            setevent(response.data);
+        } catch (err) {
+            console.error('Error fetching events:', err);
+        }
+    };
+
+    useEffect(()=> {
+        fetchEvents(id);
+    }, []);
+    console.log(event);
+    
     return (
         <div className="h-full bg-gray-200 p-8">
             <div className="bg-white rounded-lg shadow-xl pb-8">
                 <div className="w-full h-[250px] -translate-y-1">
-                    <img src={Event.eventCover} className="w-full h-full rounded-tl-lg rounded-tr-lg object-cover object-top outline-none" />
+                    <img src={event?.data?.eventCover?.url} className="w-full h-full rounded-tl-lg rounded-tr-lg object-cover object-top outline-none" />
                 </div>
                 <div className="flex flex-col items-center -mt-20 select-none">
                     <img
-                        src={Event.img}
+                        src={event?.data?.spokesPerson?.image?.url}
                         className="w-40 border-4 border-white rounded-full z-10"
                     />
                     <div className="flex items-center space-x-2 mt-2">
-                        <p className="text-2xl select-all">{Event.speakername}</p>
+                        <p className="text-2xl select-all">{event?.data?.spokesPerson?.name}</p>
                     </div>
-                    <p className="text-gray-700">{Event.currentPost}</p>
-                    <p className="text-sm text-gray-500">{Event.event}</p>
+                    {/* <p className="text-gray-700">{event?.currentPost}</p> */}
+                    <p className="text-sm text-gray-500">{event?.data?.spokesPerson?.description}</p>
                 </div>
             </div>
 
             {/* about block  */}
             <div className="flex-1 bg-white rounded-lg shadow-xl mt-4 p-8">
-                <h4 className="text-xl text-gray-900 font-bold">About {Event.speakername}</h4>
+                <h4 className="text-xl text-gray-900 font-bold">About {event?.data?.title}</h4>
                 <p className="mt-2 text-gray-700 select-all">
-                    {Event.speakerdescription}
+                    {event?.data?.description}
                 </p>
             </div>
 
@@ -56,8 +73,8 @@ const EventsPage = () => {
                     <div className="absolute h-full border border-dashed border-opacity-20 border-secondary" />
                     {/* start::Timeline item */}
                     {
-                        Event.EventPoints.map((point) => {
-                            return <TimeLineOne key={point.id} team={point.keyPoint} stage={point.keyPointExplain} />
+                        event?.data?.keyPoints?.map((point) => {
+                            return <TimeLineOne key={point.id} team={point.name} stage={point.explanation} />
                         })
                     }
                 </div>
@@ -65,16 +82,16 @@ const EventsPage = () => {
 
             {/* about event  */}
             <div className="flex-1 bg-white rounded-lg shadow-xl mt-4 p-8">
-                <h4 className="text-xl text-gray-900 font-bold">About {Event.event}</h4>
+                <h4 className="text-xl text-gray-900 font-bold">About {event?.data?.title}</h4>
                 <p className="mt-2 text-gray-700 select-all">
-                    {Event.eventDescription}
+                    {event?.data?.description}
                 </p>
             </div>
 
 
 
             {
-                Event.eventPics && Event.eventPics.length > 0 ? <div className="flex flex-col bg-white rounded-lg shadow-xl mt-4 p-8  overflow-hidden">
+                event?.data?.eventPics && event?.data?.eventPics?.length > 0 ? <div className="flex flex-col bg-white rounded-lg shadow-xl mt-4 p-8  overflow-hidden">
                     <h4 className="text-xl text-gray-900 font-bold pb-2">Event Moments</h4>
 
                     <Swiper
@@ -102,7 +119,7 @@ const EventsPage = () => {
                         className='w-[44vw] md:w-[86vw] flex items-center justify-center m-auto'
                     >
                         {
-                            Event.eventPics?.map((data, index) => {
+                            event?.data?.eventPics?.map((data, index) => {
                                 return (
                                     <SwiperSlide key={index} className='w-fit md:w-full rounded-md cursor-pointer shadow-2xl flex items-center justify-center'>
 

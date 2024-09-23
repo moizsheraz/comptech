@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
+import { FaPlus, FaTimes } from 'react-icons/fa';
 import { RiLockPasswordFill } from "react-icons/ri";
 import { HiOutlineMail } from "react-icons/hi";
 import { PiPasswordDuotone } from "react-icons/pi";
@@ -17,35 +18,53 @@ const Register = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [confirmpassword, setConfirmPassword] = useState("");
     const [name, setName] = useState("");
-    const [passwordShown, setPasswordShown] = useState(false);
+    const [team, setTeam] = useState("");
     const [avatar, setAvatar] = useState();
     const [avatarPreview, setAvatarPreview] = useState('');
     const [session, setSession] = useState("");
+    const [currentPosition, setcurrentPosition] = useState("");
     const [department, setDepartment] = useState("");
     const [about, setAbout] = useState("");
+    const [socialMedia, setsocialMedia] = useState([]);
+
+    const currentYear = new Date().getFullYear();
+    const sessionYears = Array.from({ length: 4 }, (_, i) => currentYear - i);
+
+    const addsocialMedia = () => {
+        setsocialMedia([...socialMedia, { name: '', link: '' }]);
+
+    };
+
+    const removesocialMedia = (index) => {
+        const newsocialMedia = socialMedia.filter((_, i) => i !== index);
+        setsocialMedia(newsocialMedia);
+    };
+
+    const handleInputChange = (index, field, value) => {
+        const newsocialMedia = socialMedia.map((social, i) =>
+            i === index ? { ...social, [field]: value } : social
+        );
+        setsocialMedia(newsocialMedia);
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-        if (password !== confirmpassword) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: 'Passwords do not match',
-            });
-            return;
-        }
         const Formdata = new FormData();
         Formdata.append('name', name);
         Formdata.append('email', email);
-        Formdata.append('password', password);
         Formdata.append('session', session);
+        Formdata.append('team', team);
+        Formdata.append('currentPosition', currentPosition);
         Formdata.append('department', department);
         Formdata.append('about', about);
         Formdata.append('image', avatar);
+
+        if (socialMedia.length > 0) {
+            const jsonConvertedsocialMedia = JSON.stringify(socialMedia);
+            Formdata.append('socialMedia', jsonConvertedsocialMedia);
+        }
 
         try {
             const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/user/register`, Formdata, {
@@ -60,7 +79,15 @@ const Register = () => {
                     title: 'Registration Successful',
                     text: response.data.message,
                 });
-                navigate('/login');
+                setName('');
+                setEmail('');
+                setSession('');
+                setTeam('');
+                setcurrentPosition('');
+                setDepartment('');
+                setAbout('');
+                setAvatar(null);
+                navigate('/');
             } else {
                 Swal.fire({
                     icon: 'error',
@@ -72,23 +99,48 @@ const Register = () => {
             Swal.fire({
                 icon: 'error',
                 title: 'An Error Occurred',
-                text: error.response.data.message || 'An error occurred', 
+                text: error.response.data.message || 'An error occurred',
             });
         } finally {
             setLoading(false);
         }
     };
-    const handleImageChange=(e)=>{
+
+    const handleImageChange = (e) => {
         const reader = new FileReader();
         reader.onload = () => {
-          if (reader.readyState === 2) {
-            setAvatarPreview(reader.result);
-            setAvatar(e.target.files[0]);
-          }
+            if (reader.readyState === 2) {
+                setAvatarPreview(reader.result);
+                setAvatar(e.target.files[0]);
+            }
         };
-  
+
         reader.readAsDataURL(e.target.files[0]);
-    }
+    };
+
+    const handleSessionChange = (e) => {
+        const selectedYear = e.target.value;
+        setSession(selectedYear);
+
+        let position = '';
+        switch (selectedYear) {
+            case `${currentYear}`:
+                position = 'General Member';
+                break;
+            case `${currentYear - 1}`:
+                position = 'Executive';
+                break;
+            case `${currentYear - 2}`:
+                position = 'Assistent Director';
+                break;
+            case `${currentYear - 3}`:
+                position = 'Cabinet';
+                break;
+            default:
+                position = '';
+        }
+        setcurrentPosition(position);
+    };
 
     return (
         <div className="login_signup_container bg-slate-200">
@@ -106,7 +158,7 @@ const Register = () => {
                 </div>
                 <div className="inputForm">
                     <HiOutlineMail />
-                    <input type="email" autoComplete={"true"} value={email} onChange={(e) => setEmail(e.target.value)} className="input" placeholder="22-CS-49@students.uettaxila.edu.pk" required />
+                    <input type="email" autoComplete={"true"} value={email} onChange={(e) => setEmail(e.target.value)} className="input" placeholder="22-CS-66@students.uettaxila.edu.pk" required />
                 </div>
                 <div className="flex-column">
                     <label>Session</label>
@@ -117,14 +169,42 @@ const Register = () => {
                         required={true}
                         name="session"
                         id="session"
-                        onChange={(e) => setSession(e.target.value)}
+                        onChange={handleSessionChange}
                         className="px-4 py-2 w-full sm:text-sm border-gray-300 rounded-md text-gray-600"
                     >
                         <option value="#">---Select a session---</option>
-                        <option value="2021">2021</option>
-                        <option value="2022">2022</option>
-                        <option value="2023">2023</option>
-                        <option value="2024">2024</option>
+                        {sessionYears.map(year => (
+                            <option key={year} value={year}>{year}</option>
+                        ))}
+                    </select>
+                </div>
+                <div className="flex-column">
+                    <label>Current Position</label>
+                </div>
+                <div className="inputForm">
+                    <MdOutlinePermIdentity />
+                    <input type="text" value={currentPosition} className="input" readOnly placeholder='Please Select Your Session' />
+                </div>
+                <div className="flex-column">
+                    <label>Team</label>
+                </div>
+                <div className="inputForm">
+                    <MdOutlinePermIdentity />
+                    <select
+                        required={true}
+                        name="team"
+                        id="team"
+                        onChange={(e) => setTeam(e.target.value)}
+                        className="px-4 py-2 w-full sm:text-sm border-gray-300 rounded-md text-gray-600"
+                    >
+                        <option value="#">---Select a team---</option>
+                        <option value="Management">Management</option>
+                        <option value="Logistics">Logistics</option>
+                        <option value="Decor">Decor</option>
+                        <option value="Media">Media</option>
+                        <option value="DevOps">DevOps</option>
+                        <option value="HR">HR</option>
+                        <option value="Left">Left</option>
                     </select>
                 </div>
                 <div className="flex-column">
@@ -145,37 +225,6 @@ const Register = () => {
                         <option value="ME">Mechanical</option>
                         <option value="CE">Civil Engineering</option>
                     </select>
-                </div>
-                <div className="flex-column">
-                    <label>Password</label>
-                </div>
-                <div className="inputForm">
-                    <RiLockPasswordFill />
-                    <input
-                        type={`${passwordShown ? "text" : "password"}`}
-                        className="input"
-                        value={password}
-                        required
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Enter a strong password"
-                    />
-                    {
-                        passwordShown ? <AiFillEyeInvisible className='cursor-pointer' onClick={() => setPasswordShown(false)} /> : <AiFillEye className='cursor-pointer' onClick={() => setPasswordShown(true)} />
-                    }
-                </div>
-                <div className="flex-column">
-                    <label>Confirm Password</label>
-                </div>
-                <div className="inputForm">
-                    <PiPasswordDuotone />
-                    <input
-                        type={`${passwordShown ? "text" : "password"}`}
-                        className="input"
-                        value={confirmpassword}
-                        required
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        placeholder="Confirm your password"
-                    />
                 </div>
                 <div className="flex-column flex">
                     <label>About</label>
@@ -212,11 +261,48 @@ const Register = () => {
                         </div>
                     </label>
                 </div>
+                {/* Social Media  */}
+                <div className="flex flex-col">
+                    <label className="leading-loose">Social Media Links</label>
+                    <button
+                        type="button"
+                        onClick={addsocialMedia}
+                        className="flex items-center px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600"
+                    >
+                        <FaPlus className="mr-2" /> Add Social Media Link
+                    </button>
+                    {socialMedia.map((social, index) => (
+                        <div key={index} className="flex flex-row items-center space-x-4 mt-4">
+                            <input
+                                type="text"
+                                value={social.name}
+                                onChange={(e) => handleInputChange(index, 'name', e.target.value)}
+                                className="px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600"
+                                placeholder="Social Media Name"
+                            />
+                            <input
+                                type="text"
+                                value={social.link}
+                                onChange={(e) => handleInputChange(index, 'link', e.target.value)}
+                                className="px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600"
+                                placeholder="Social Media Link"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => removesocialMedia(index)}
+                                className="text-gray-400"
+                            >
+                                <FaTimes />
+                            </button>
+                        </div>
+                    ))}
+                </div>
+                {/* end points */}
                 <button type="submit" className="button-submit" disabled={loading}>Sign Up</button>
                 <p className="p">
-                   <button disabled={loading}>
-                   Already a comptechian! <Link to={"/login"} className="span">Sign in</Link>
-                   </button>
+                    <button disabled={loading}>
+                        Already a comptechian! <Link to={"/login"} className="span">Sign in</Link>
+                    </button>
                 </p>
             </form>
         </div>
